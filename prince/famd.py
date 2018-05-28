@@ -1,12 +1,10 @@
 """Factor Analysis of Mixed Data (FAMD)"""
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn import utils
 
 from . import pca
 from . import one_hot
-from . import plot
 
 
 class FAMD(pca.PCA):

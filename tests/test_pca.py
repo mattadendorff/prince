@@ -1,6 +1,5 @@
 import unittest
 
-import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from sklearn import datasets
@@ -91,12 +90,6 @@ class TestPCA(unittest.TestCase):
         pca = prince.PCA(n_components=4)
         pca.fit(self.X)
         self.assertTrue(np.isclose(sum(pca.explained_inertia_), 1))
-
-    def test_plot_row_coordinates(self):
-        pca = prince.PCA(n_components=4)
-        pca.fit(self.X)
-        ax = pca.plot_row_coordinates(self.X)
-        self.assertTrue(isinstance(ax, mpl.axes.Axes))
 
     def test_check_estimator(self):
         estimator_checks.check_estimator(prince.PCA)

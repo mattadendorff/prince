@@ -1,13 +1,10 @@
 """Principal Component Analysis (PCA)"""
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn import base
 from sklearn import preprocessing
 from sklearn import utils
 
-from . import plot
 from . import util
 from . import svd
 
@@ -169,64 +166,3 @@ class PCA(base.BaseEstimator, base.TransformerMixin):
         """Returns the percentage of explained inertia per principal component."""
         utils.validation.check_is_fitted(self, 's_')
         return [eig / self.total_inertia_ for eig in self.eigenvalues_]
-
-    def plot_row_coordinates(self, X, ax=None, figsize=(6, 6), x_component=0, y_component=1,
-                             labels=None, color_labels=None, ellipse_outline=False,
-                             ellipse_fill=True, show_points=True, **kwargs):
-        """Plot the row principal coordinates."""
-        utils.validation.check_is_fitted(self, 's_')
-
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        # Add style
-        ax = plot.stylize_axis(ax)
-
-        # Make sure X is a DataFrame
-        if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X)
-
-        # Retrieve principal coordinates
-        coordinates = self.row_coordinates(X)
-        x = coordinates[x_component]
-        y = coordinates[y_component]
-
-        # Plot
-        if color_labels is None:
-            ax.scatter(x, y, **kwargs)
-        else:
-            for color_label in sorted(list(set(color_labels))):
-                mask = np.array(color_labels) == color_label
-                color = ax._get_lines.get_next_color()
-                # Plot points
-                if show_points:
-                    ax.scatter(x[mask], y[mask], color=color, **kwargs, label=color_label)
-                # Plot ellipse
-                if (ellipse_outline or ellipse_fill):
-                    x_mean, y_mean, width, height, angle = plot.build_ellipse(x[mask], y[mask])
-                    ax.add_patch(mpl.patches.Ellipse(
-                        (x_mean, y_mean),
-                        width,
-                        height,
-                        angle=angle,
-                        linewidth=2 if ellipse_outline else 0,
-                        color=color,
-                        fill=ellipse_fill,
-                        alpha=0.2 + (0.3 if not show_points else 0) if ellipse_fill else 1
-                    ))
-
-        # Add labels
-        if labels is not None:
-            for i, label in enumerate(labels):
-                ax.annotate(label, (x[i], y[i]))
-
-        # Legend
-        ax.legend()
-
-        # Text
-        ax.set_title('Row principal coordinates')
-        ei = self.explained_inertia_
-        ax.set_xlabel('Component {} ({:.2f}% inertia)'.format(x_component, 100 * ei[x_component]))
-        ax.set_ylabel('Component {} ({:.2f}% inertia)'.format(y_component, 100 * ei[y_component]))
-
-        return ax
